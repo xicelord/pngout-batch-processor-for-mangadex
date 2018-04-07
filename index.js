@@ -3,8 +3,8 @@ const async = require('async');
 const child_process = require('child_process');
 
 let counter = 0;
-let total_changes = 0;
 let scan = {
+  total_changes: 0,
   path: '',
   processed: [],
   found: []
@@ -57,7 +57,7 @@ async.mapSeries(found_copy, processDirectory, (err) => {
     return;
   } else {
     console.log('All done :)');
-    console.log('Total changes: ' + (total_changes >= 0 ? '+' : '') + total_changes + ' b');
+    console.log('Total changes: ' + (scan.total_changes >= 0 ? '+' : '') + scan.total_changes + ' b');
     return;
   }
 });
@@ -65,7 +65,7 @@ async.mapSeries(found_copy, processDirectory, (err) => {
 
 //Function responsible for processing a directory/chapter
 function processDirectory(directory, processDirectory_callback) {
-  console.log('Processing "' + directory + '" (Total changes: ' + (total_changes >= 0 ? '+' : '') + total_changes + ' b)');
+  console.log('Processing "' + directory + '" (Total changes: ' + (scan.total_changes >= 0 ? '+' : '') + scan.total_changes + ' b)');
 
   //Scan folder for content
   fs.readdir(scan.path + directory, (err, files) => {
@@ -105,10 +105,10 @@ function processDirectory(directory, processDirectory_callback) {
         //Update, Save & Notify
         if (!mapLimit_error) {
           scan.processed.push(scan.found.pop());
-          fs.writeFileSync('./scanfile.json', JSON.stringify(scan));
           let chapter_change = changes.reduce((a, b) => a+b, 0);
+          scan.total_changes += chapter_change;
+          fs.writeFileSync('./scanfile.json', JSON.stringify(scan));
           console.log('Done! (' + (chapter_change >= 0 ? '+' : '') + chapter_change + ' b)');
-          total_changes += chapter_change;
         }
 
         //Make backup if necessary
