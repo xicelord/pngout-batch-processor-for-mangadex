@@ -3,6 +3,7 @@ const async = require('async');
 const child_process = require('child_process');
 
 let counter = 0;
+let total_changes = 0;
 let scan = {
   path: '',
   processed: [],
@@ -56,6 +57,7 @@ async.mapSeries(found_copy, processDirectory, (err) => {
     return;
   } else {
     console.log('All done :)');
+    console.log('Total changes: ' + (total_changes >= 0 ? '+' : '') + total_changes + ' b');
     return;
   }
 });
@@ -63,7 +65,7 @@ async.mapSeries(found_copy, processDirectory, (err) => {
 
 //Function responsible for processing a directory/chapter
 function processDirectory(directory, processDirectory_callback) {
-  console.log('Processing "' + directory + '"');
+  console.log('Processing "' + directory + '" (Total changes: ' + (total_changes >= 0 ? '+' : '') + total_changes + ' b)');
 
   //Scan folder for content
   fs.readdir(scan.path + directory, (err, files) => {
@@ -81,21 +83,32 @@ function processDirectory(directory, processDirectory_callback) {
               //Abort on error; Ignore Error 2: Could not make image smaller
               if (error && error.code !== 2) {
                 asyncFilter_callback(error);
+              } else if (!error) {
+                let change = 0;
+
+                try {
+                  change = parseInt(stdout.match(/Chg:.*((-|\+)\d+)/)[1]);
+                  if (isNaN(change)) { change = 0; }
+                } catch (ex) {}
+
+                asyncFilter_callback(null, change);
               } else {
-                asyncFilter_callback(null);
+                asyncFilter_callback(null, 0);
               }
             });
         } else {
           //Nothing to do
-          asyncFilter_callback(null);
+          asyncFilter_callback(null, 0);
         }
       },
-      (mapLimit_error) => {
+      (mapLimit_error, changes) => {
         //Update, Save & Notify
         if (!mapLimit_error) {
           scan.processed.push(scan.found.pop());
           fs.writeFileSync('./scanfile.json', JSON.stringify(scan));
-          console.log('Done!');
+          let chapter_change = changes.reduce((a, b) => a+b, 0);
+          console.log('Done! (' + (chapter_change >= 0 ? '+' : '') + chapter_change + ' b)');
+          total_changes += chapter_change;
         }
 
         //Make backup if necessary
