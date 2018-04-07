@@ -8,6 +8,7 @@ for files is done.
 The application will create a file called `scanfile.json` and backup it every time the application  
 starts or after 100 chapters were processed.  
 If a scanfile is found, it will ignore the passed directory as long as there still are directories in the queue.  
+If the queue is empty, the passed directory will be scanned, already processed chapter-directories will be filtered out.  
 Make sure to **BACKUP EVERYTHING** ***BEFORE*** you start the process.
 
 ## Usage
