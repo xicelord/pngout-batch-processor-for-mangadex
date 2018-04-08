@@ -9,6 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.0"
+    "async": "^2.6.0",
+    "better-sqlite3": "^4.1.0",
+    "image-type": "^3.0.0",
+    "read-chunk": "^2.1.0"
   }
 }
