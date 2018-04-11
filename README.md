@@ -3,11 +3,11 @@ Processes a directory containing many directories full of images
 
 ## Notes
 Do make sure that the directory you pass as argument only contains other directories.  
-This is due to the fact, that all content of the directory is searched for and no additional filtering  
+This requirement is due to the fact, that all content of the directory is searched for and no additional filtering  
 for files is done.  
-The application will create a file called `scanfile.json` and backup it every time the application  
+The application will create a file called `scandb.sqlite3` and backup it every time the application  
 starts or after 100 chapters were processed.  
-If a scanfile is found, it will ignore the passed directory as long as there still are directories in the queue.  
+Even if a scan-database is found, you will need to pass it the directory of the chapters.  
 If the queue is empty, the passed directory will be scanned, already processed chapter-directories will be filtered out.  
 Make sure to **BACKUP EVERYTHING** ***BEFORE*** you start the process.
 
